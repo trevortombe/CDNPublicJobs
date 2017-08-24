@@ -112,7 +112,7 @@ ggplot(plotdata,aes(short,share,group=NAICS,fill=NAICS))+
   scale_fill_brewer(name="",palette = "Set1")+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=percent) +
   labs(x="",y="Per Cent",
-       title="Public Share of Labour Compensation, by Govt Sector (2016)",
+       title="Public Sector Share of Labour Compensation, by Govt Sector (2016)",
        subtitle="",
        caption="Source: CANSIM 383-0033. Graph by @trevortombe")
 ggsave("plot3.png",width=7,height=4,dpi=200)
