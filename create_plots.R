@@ -34,11 +34,12 @@ plotdata<-empdata %>%
 ggplot(plotdata,aes(Ref_Date,change,group=Industry,color=Industry))+
   geom_line(size=2) +
   geom_hline(yintercept = 0,size=1)+
-  geom_point(data=filter(plotdata,Ref_Date==2018),size=3,show.legend = F)+
+  geom_point(data=filter(plotdata,Ref_Date==max(Ref_Date)),size=2.5,stroke=2.5,
+             shape=21,fill='white',show.legend = F)+
   mytheme+
   scale_colour_brewer(name="",palette="Set1") +
   scale_y_continuous(breaks=pretty_breaks(n=6),label=comma) +
-  scale_x_continuous(breaks=seq(2014,2018)) +
+  scale_x_continuous(breaks=seq(2014,max(plotdata$Ref_Date))) +
   labs(x="",y="Number of Jobs",
        title="Change in Alberta Public Employment, by Govt Sector",
        subtitle="Source: Own calculations from Statistics Canada data table 36-10-0480.",
@@ -73,7 +74,6 @@ plotdata2<-plotdata %>%
   filter(Ref_Date==max(Ref_Date)) %>%
   left_join(pop2,by=c("Ref_Date","GEO")) %>%
   mutate(share=Value/population) %>%
-  left_join(provnames,by="GEO") %>%
   filter(short!="NA" & short!="CAN" & !short %in% c("YT","NT","NU")) %>%
   select(Ref_Date,short,Industry,Value,population,share)
 ggplot(plotdata2,aes(short,share,group=Industry,fill=Industry))+
@@ -83,7 +83,8 @@ ggplot(plotdata2,aes(short,share,group=Industry,fill=Industry))+
   scale_fill_brewer(name="",palette = "Set1")+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=percent) +
   labs(x="",y="Per Cent",
-       title="Public Employment as % of Population, by Govt Sector (2018)",
+       title=paste0("Public Employment as % of Population, by Govt Sector (",
+                    max(plotdata2$Ref_Date),")"),
        subtitle="Source: Own calculations from Statistics Canada data table CANSIM 36-10-0480 and 17-10-0005.",
        caption="Graph by @trevortombe")
 ggsave("plot2.png",width=8,height=4,dpi=200)
@@ -109,7 +110,6 @@ plotdata<-empdata %>%
          Industry=replace(Industry,Industry=="Aboriginal government services","Aboriginal Govt")) %>%
   group_by(GEO) %>%
   mutate(share=Value/max(Value*(Industry=="All industries"))) %>%
-  left_join(provnames,by="GEO") %>%
   filter(Industry!="All industries" & short!="NA" & short!="CAN"& !short %in% c("YT","NT","NU"))
 ggplot(plotdata,aes(short,share,group=Industry,fill=Industry))+
   geom_col(position="stack",color="white")+
@@ -118,7 +118,49 @@ ggplot(plotdata,aes(short,share,group=Industry,fill=Industry))+
   scale_fill_brewer(name="",palette = "Set1")+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=percent) +
   labs(x="",y="Per Cent",
-       title="Public Sector Share of Labour Compensation, by Govt Sector (2018)",
+       title=paste0("Public Sector Share of Total Labour Compensation (",
+       max(plotdata2$Ref_Date),")"),
        subtitle="Source: Own calculations from Statistics Canada data table CANSIM 36-10-0480",
        caption="Graph by @trevortombe")
 ggsave("plot3.png",width=8,height=4,dpi=200)
+
+# Average Hourly Pay in Selected Government Sectors
+plotdata<-empdata %>%
+  filter(Ref_Date==max(Ref_Date),GEO %in% c("Alberta","British Columbia","Ontario","Quebec"),
+         Labour.productivity.and.related.measures=="Total compensation per hour worked" &
+           Industry %in% c("Government educational services",
+                           "Government health services",
+                           "Provincial and territorial government services",
+                           "All industries"))
+ggplot(plotdata,aes(reorder(Industry,Value),Value,group=GEO,fill=GEO))+
+  geom_col(position='dodge')+
+  coord_flip()+
+  geom_hline(yintercept=0,size=1)+
+  mythemebarflip+
+  labs(y="Dollars per Hour",
+       x="",
+       title=paste0("Average Hourly Labour Compensation, Selected Government Sectors (",
+                    max(plotdata$Ref_Date),")"),
+       subtitle="Source: Own calculations from Statistics Canada data table CANSIM 36-10-0480",
+       caption="Graph by @trevortombe")
+ggsave("plot4.png",width=10,height=5,dpi=200)
+
+# Average Hourly Pay in Selected Government Sectors over time
+plotdata<-empdata %>%
+  filter(GEO %in% c("Alberta","Canada"),
+         Labour.productivity.and.related.measures=="Total compensation per hour worked" &
+           Industry %in% c("Government educational services",
+                           "Government health services",
+                           "All industries"))
+ggplot(plotdata,aes(Ref_Date,Value,group=Industry,color=Industry))+
+  geom_line(size=2)+
+  facet_wrap(~GEO)+
+  geom_hline(yintercept=0,size=1)+
+  mytheme+
+  labs(y="Dollars per Hour",
+       x="",
+       title="Average Hourly Labour Compensation, Selected Government Sectors",
+       subtitle="Source: Own calculations from Statistics Canada data table CANSIM 36-10-0480",
+       caption="Graph by @trevortombe")
+ggsave("plot5.png",width=9,height=4.5,dpi=200)
+
