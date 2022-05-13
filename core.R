@@ -22,7 +22,7 @@ scale_colour_discrete <- function(...) {
   scale_colour_manual(..., values = col)
 }
 scale_fill_discrete <- function(...) {
-  scale_fill_manual(..., values = colbar)
+  scale_fill_manual(..., values = col)
 }
 
 # Useful lists

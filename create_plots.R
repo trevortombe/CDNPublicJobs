@@ -13,7 +13,7 @@ empdata<-empdata %>%
 
 # Employment by Level of Government
 plotdata<-empdata %>%
-  filter(GEO=="Alberta" & Labour.productivity.and.related.measures=="Total number of jobs" &
+  filter(GEO=="Canada" & Labour.productivity.and.related.measures=="Total number of jobs" &
            Industry %in% c("Government educational services",
                         "Government health services",
                         "Federal government services (excluding defence)",
@@ -41,7 +41,7 @@ ggplot(plotdata,aes(Ref_Date,change,group=Industry,color=Industry))+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=comma) +
   scale_x_continuous(breaks=seq(2014,max(plotdata$Ref_Date))) +
   labs(x="",y="Number of Jobs",
-       title="Change in Alberta Public Employment, by Govt Sector",
+       title="Change in Canada Public Employment, by Govt Sector",
        subtitle="Source: Own calculations from Statistics Canada data table 36-10-0480.",
        caption="Graph by @trevortombe")
 ggsave("plot.png",width=8,height=4,dpi=200)
@@ -67,7 +67,7 @@ plotdata<-empdata %>%
   group_by(Industry) %>%
   mutate(change=Value-Value[1])
 pop2<-pop %>%
-  filter(Sex=="Both sexes" & Age.group=="All ages" & Ref_Date==max(Ref_Date)) %>%
+  filter(Sex=="Both sexes" & Age.group=="All ages") %>%
   rename(population=Value) %>%
   select(Ref_Date,GEO,population)
 plotdata2<-plotdata %>%
@@ -80,7 +80,6 @@ ggplot(plotdata2,aes(short,share,group=Industry,fill=Industry))+
   geom_col(position="stack",color="white")+
   geom_hline(yintercept=0,size=1)+
   mythemebar+
-  scale_fill_brewer(name="",palette = "Set1")+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=percent) +
   labs(x="",y="Per Cent",
        title=paste0("Public Employment as % of Population, by Govt Sector (",
@@ -115,7 +114,6 @@ ggplot(plotdata,aes(short,share,group=Industry,fill=Industry))+
   geom_col(position="stack",color="white")+
   geom_hline(yintercept=0,size=1)+
   mythemebar+
-  scale_fill_brewer(name="",palette = "Set1")+
   scale_y_continuous(breaks=pretty_breaks(n=6),label=percent) +
   labs(x="",y="Per Cent",
        title=paste0("Public Sector Share of Total Labour Compensation (",
